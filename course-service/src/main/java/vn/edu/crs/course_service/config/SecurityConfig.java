@@ -23,10 +23,10 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/internal/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/courses/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/courses/**").hasAnyRole("ADMIN", "STUDENT")
-                        .requestMatchers(HttpMethod.PUT, "/courses/**").hasAnyRole("ADMIN", "STUDENT")
-                        .requestMatchers(HttpMethod.DELETE, "/courses/**").hasAnyRole("ADMIN", "STUDENT")
+                        .requestMatchers(HttpMethod.GET, "/courses", "/courses/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/courses", "/courses/**").hasAnyRole("ADMIN", "STUDENT")
+                        .requestMatchers(HttpMethod.PUT, "/courses", "/courses/**").hasAnyRole("ADMIN", "STUDENT")
+                        .requestMatchers(HttpMethod.DELETE, "/courses", "/courses/**").hasAnyRole("ADMIN", "STUDENT")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
