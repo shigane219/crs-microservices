@@ -1,18 +1,28 @@
-// path: crs-frontend/src/api/courseApi.ts  
-// purpose: ham goi HTTP den GET /api/courses qua axios  
-  
-import axios from 'axios';  
-import type { Course } from '../types/course';  
-import type { PageResponse } from '../types/course';  
-  
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';  
-  
-export function getCourses(  
-  keyword: string,  
-  page: number,  
-  size: number  
-) {
-  return axios.get<PageResponse<Course>>(`${BASE_URL}/api/courses`, {
-    params: { keyword, page, size },  
-  });  
-}  
+// path: crs-frontend/src/api/courseApi.ts
+// purpose: bo sung createCourse/updateCourse/deleteCourse, giu nguyen getCourses tu Buoi 5
+import axiosClient from './axiosClient';
+import type { Course, PagedResponse, CourseFormValues } from '../types/course';
+
+export const getCourses = (keyword?: string, page = 0, size = 10) => {
+  return axiosClient.get<PagedResponse<Course>>('/api/courses', {
+    params: { keyword, page, size },
+  });
+};
+
+const toPayload = (values: CourseFormValues) => ({
+  tenMonHoc: values.tenMonHoc.trim(),
+  soTinChi: Number(values.soTinChi),
+  soChoToiDa: Number(values.soChoToiDa),
+});
+
+export const createCourse = (values: CourseFormValues) => {
+  return axiosClient.post<Course>('/api/courses', toPayload(values));
+};
+
+export const updateCourse = (id: number, values: CourseFormValues) => {
+  return axiosClient.put<Course>(`/api/courses/${id}`, toPayload(values));
+};
+
+export const deleteCourse = (id: number) => {
+  return axiosClient.delete(`/api/courses/${id}`);
+};
