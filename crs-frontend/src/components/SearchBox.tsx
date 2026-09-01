@@ -1,8 +1,8 @@
-﻿// path: crs-frontend/src/components/SearchBox.tsx
+// path: crs-frontend/src/components/SearchBox.tsx
 // purpose: o nhap tim kiem mon hoc, co debounce de tranh goi
 // API lien tuc khi go phim
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface SearchBoxProps {
   onSearch: (keyword: string) => void;
@@ -11,14 +11,17 @@ interface SearchBoxProps {
 
 export default function SearchBox({ onSearch, placeholder }: SearchBoxProps) {
   const [inputValue, setInputValue] = useState('');
+  // Dung ref de luu callback moi nhat, tranh effect chay lai moi khi component cha re-render
+  const onSearchRef = useRef(onSearch);
+  useEffect(() => { onSearchRef.current = onSearch; });
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      onSearch(inputValue.trim());
+      onSearchRef.current(inputValue.trim());
     }, 400);
 
     return () => clearTimeout(timer); // huy timer cu moi lan inputValue thay doi
-  }, [inputValue, onSearch]);
+  }, [inputValue]); // Chi chay lai khi inputValue thay doi, KHONG phu thuoc vao onSearch
 
   return (
     <input

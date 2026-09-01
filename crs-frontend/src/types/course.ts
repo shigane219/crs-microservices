@@ -28,3 +28,8 @@ export const emptyCourseForm: CourseFormValues = {
   soTinChi: '',
   soChoToiDa: '',
 };
+export interface CourseFormValues {
+  tenMonHoc: string;
+  soTinChi: string; // Dùng string trong form để dễ kiểm soát input rỗng, sẽ parseInt khi gửi đi
+  soChoToiDa: string;
+}

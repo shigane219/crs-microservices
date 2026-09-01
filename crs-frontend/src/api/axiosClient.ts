@@ -23,3 +23,10 @@ axiosClient.interceptors.request.use((config) => {
 });
 
 export default axiosClient;
+axiosClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('crs_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
