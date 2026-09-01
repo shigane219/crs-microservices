@@ -1,11 +1,5 @@
-// path: crs-frontend/src/api/axiosClient.ts
-// purpose: axios instance duy nhat cua frontend, tro ve
-// api-gateway va tu dong dinh kem
-// Authorization header neu co token trong localStorage.
-// LUU Y: day la ban toi gian - Buoi 8 se bo sung Response Interceptor de tu
-// dong dang xuat khi gap loi 401 (token het han), khong can sua lai
-// doan code duoi day.
 import axios from 'axios';
+import { triggerLogout } from './authEventBus';
 
 const axiosClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -14,6 +8,7 @@ const axiosClient = axios.create({
   },
 });
 
+// Request Interceptor - tu Buoi 7, giu nguyen
 axiosClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('crs_token');
   if (token) {
@@ -22,11 +17,18 @@ axiosClient.interceptors.request.use((config) => {
   return config;
 });
 
+// Response Interceptor - Buoi 8:
+// Khi nhan HTTP 401, goi triggerLogout() de thong bao cho AuthContext
+// xoa state, xoa localStorage va chuyen ve /login.
+// KHONG xu ly truc tiep o day de dam bao React state dong bo.
+axiosClient.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        triggerLogout();
+      }
+      return Promise.reject(error);
+    }
+);
+
 export default axiosClient;
-axiosClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('crs_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
