@@ -55,7 +55,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             } catch (Exception e) {
+                // Xóa context và chặn request ngay tại filter khi token lỗi
                 SecurityContextHolder.clearContext();
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json;charset=UTF-8");
+                response.getWriter().write("{\"message\": \"Token khong hop le hoac da bi gia mao!\"}");
+                return; // Dừng chuỗi Filter, không cho request đi tiếp vào controller/gateway
             }
         }
 
