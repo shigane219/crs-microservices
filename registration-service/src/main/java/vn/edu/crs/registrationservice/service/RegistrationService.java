@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List; // ĐÃ BỔ SUNG: Import thư viện List
 import java.util.NoSuchElementException;
 
 @Service
@@ -51,5 +52,10 @@ public class RegistrationService {
 
         registration.setTrangThai(DA_HUY);
         registrationRepository.save(registration);
+    }
+
+    // --- ĐÃ BỔ SUNG: Phương thức lấy danh sách đăng ký của sinh viên (Buổi 9) ---
+    public List<Registration> getMyRegistrations(Long studentId) {
+        return registrationRepository.findByStudentId(studentId);
     }
 }

@@ -16,7 +16,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Component
@@ -26,34 +25,37 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private String secret;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
             try {
-                SecretKey key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+                SecretKey key = Keys.hmacShaKeyFor(secret.getBytes());
+
+                // --- BẮT ĐẦU ĐOẠN MÃ MỚI CỦA BUỔI 9 ---
                 Claims claims = Jwts.parser()
-                        .verifyWith(key)
+                        .verifyWith (key)
                         .build()
-                        .parseSignedClaims(token)
+                        .parseSignedClaims (token)
                         .getPayload();
 
                 String username = claims.getSubject();
                 String role = claims.get("role", String.class);
+                Long userId = claims.get("userId", Long.class);
 
-                if (role != null) {
-                    String authority = role.startsWith("ROLE_") ? role : "ROLE_" + role;
-                    var authToken = new UsernamePasswordAuthenticationToken(
-                            username,
-                            null,
-                            List.of(new SimpleGrantedAuthority(authority))
-                    );
+                // Lưu userId vào tham số credentials (tham số thứ 2)
+                var authToken = new UsernamePasswordAuthenticationToken(
+                        username,
+                        userId,
+                        List.of(new SimpleGrantedAuthority ("ROLE_" + role))
+                );
 
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
-                }
+                SecurityContextHolder.getContext().setAuthentication (authToken);
+                // --- KẾT THÚC ĐOẠN MÃ MỚI CỦA BUỔI 9 ---
+
             } catch (Exception e) {
                 SecurityContextHolder.clearContext();
             }
